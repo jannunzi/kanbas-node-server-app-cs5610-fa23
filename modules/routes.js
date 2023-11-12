@@ -1,12 +1,19 @@
 import Database from "../Database/index.js";
+import * as dao from "./dao.js";
 function ModuleRoutes(app) {
-  app.get("/api/modules", (req, res) => {
-    const modules = Database.modules;
+  app.get("/api/courses/:cid/modules", async (req, res) => {
+    const { cid } = req.params;
+    const modules = await dao.findModulesForCourse(cid);
     res.json(modules);
   });
-  app.get("/api/courses/:id/modules", (req, res) => {
-    const { id } = req.params;
-    const modules = Database.modules.filter((module) => module.course === id);
+  app.post("/api/courses/:cid/modules", async (req, res) => {
+    const { cid } = req.params;
+    const newModule = await dao.createModule(cid, req.body);
+    res.json(newModule);
+  });
+
+  app.get("/api/modules", async (req, res) => {
+    const modules = await dao.findAllModules(); //Database.modules;
     res.json(modules);
   });
   app.get("/api/modules/:id", (req, res) => {
@@ -27,15 +34,6 @@ function ModuleRoutes(app) {
     }
     Database.modules.splice(index, 1);
     res.json(204);
-  });
-  app.post("/api/courses/:cid/modules", (req, res) => {
-    const newModule = {
-      ...req.body,
-      course: req.params.cid,
-      _id: new Date().getTime().toString(),
-    };
-    Database.modules.unshift(newModule);
-    res.json(newModule);
   });
   app.put("/api/modules/:id", (req, res) => {
     const { id } = req.params;
