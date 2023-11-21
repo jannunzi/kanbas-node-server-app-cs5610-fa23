@@ -1,4 +1,6 @@
 // const express = require("express");
+import session from "express-session";
+
 import express from "express";
 import HelloRoutes from "./hello.js";
 import Lab5 from "./lab5.js";
@@ -12,7 +14,20 @@ import cors from "cors";
 mongoose.connect("mongodb://127.0.0.1:27017/kanbas-cs5610-fa23");
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:3000",
+  })
+);
+
+const sessionOptions = {
+  secret: "any string",
+  resave: false,
+  saveUninitialized: false,
+};
+app.use(session(sessionOptions));
+
 app.use(express.json());
 
 LikesRoutes(app);
